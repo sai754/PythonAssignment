@@ -1,3 +1,5 @@
+from Exception.exceptions import InvalidDataException
+
 class Customer:
     def __init__(self, customer_id, first_name, last_name, email, phone, address):
         self.__customer_id = customer_id
@@ -6,7 +8,6 @@ class Customer:
         self.__email = email
         self.__phone = phone
         self.__address = address
-        self.__total_orders = 0
 
     @property
     def customer_id(self):
@@ -34,7 +35,13 @@ class Customer:
 
     @email.setter
     def email(self, value):
-        self.__email = value
+        try:
+            if not self.is_valid_email(value):
+                raise InvalidDataException("Invalid email address format.")
+        except InvalidDataException as e:
+            print(e)
+        else:
+            self.__Email = value
 
     @property
     def phone(self):
@@ -51,3 +58,9 @@ class Customer:
     @address.setter
     def address(self, value):
         self.__address = value
+    
+    def is_valid_email(self, email):
+        if "@" in email and "." in email:
+            return True
+        else:
+            return False
