@@ -5,6 +5,7 @@ class Product:
         self.__product_name = product_name
         self.__description = description
         self.__price = price
+        Product.products.append(self)
 
     @property
     def product_id(self):
@@ -41,6 +42,7 @@ class Product:
     def add_product(cls, product_id, product_name, description, price):
         if cls._find_product_by_id(product_id):
             raise ValueError("Product with the same ID already exists.")
+        cls._check_duplicate(product_name)
         product = cls(product_id, product_name, description, price)
         cls.products.append(product)
         print("Product added successfully.")
@@ -79,3 +81,19 @@ class Product:
     def view_all_products(cls):
         for product in cls.products:
             print(product.product_id, product.product_name,product.description)
+
+    @classmethod
+    def search_by_name(cls, name):
+        results = [product for product in cls.products if name.lower() in product.product_name.lower()]
+        return results
+
+    @classmethod
+    def search_by_price_range(cls, min_price, max_price):
+        results = [product for product in cls.products if min_price <= product.price <= max_price]
+        return results
+
+    @classmethod
+    def _check_duplicate(cls, product_name):
+        for product in cls.products:
+            if product.product_name == product_name:
+                raise ValueError(f"Product with name '{product_name}' already exists.")
