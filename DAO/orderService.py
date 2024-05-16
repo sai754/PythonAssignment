@@ -1,32 +1,58 @@
+from Util.DBConn import DBConnection
 from decimal import Decimal
-class OrderService:
-    def __init__(self,order):
-        self.order = order
-    def calculate_total_amount(self):
-        total_amount = Decimal('0.00')
-        for item in self.__order_items:
-            product = item['product']
-            quantity = item['quantity']
-            price = product.price
-            total_amount += price * quantity
-        self.__total_amount = total_amount
+from datetime import date
+class OrderService(DBConnection):
+    def create_order(self,customerid):
+        order_items = []
+        while (True):
+            product_id = int(input("Enter Product ID to add to the order (0 to finish): "))
+            if product_id == 0:
+                break
+            quantity = int(input("Enter Quantity: "))
+            self.cursor.execute("SELECT ProductID, Price FROM Products WHERE ProductID = ?", (product_id,))
+            product = self.cursor.fetchone()
+            if product:
+                order_items.append({'product_id': product.ProductID, 'quantity': quantity, 'price': product.Price})
+            else:
+                print("Product not found!")
+        total_amount = sum(item['quantity'] * item['price'] for item in order_items)
+        orderid = self.cursor.execute("select top 1 OrderID from Orders order by OrderID desc ").fetchone()[0] + 1
+        self.cursor.execute("INSERT INTO Orders VALUES (?,?, ?, ?,?)",
+                           (orderid,customerid, date.today(), total_amount,"Pending"))
+        self.conn.commit()
+        orderdetailid = self.cursor.execute("select top 1 OrderDetailID from OrderDetails order by OrderDetailID desc ").fetchone()[0] + 1
+        for item in order_items:
+                self.cursor.execute("INSERT INTO OrderDetails VALUES (?, ?, ?,?)",
+                               (orderdetailid, orderid, item['product_id'], item['quantity']))
+        self.conn.commit()
+        print("Order placed successfully!")
+    
+    def get_All_Orders(self):
+         self.cursor.execute("Select * from Orders")
+         for row in self.cursor:
+              print(row)
+    
+    def calcuclate_total_amount(self,orderid):
+         self.cursor.execute("""Select sum(Quantity * Price) as TotalAmount
+                               from OrderDetails
+                               inner join Products ON OrderDetails.ProductID = Products.ProductID
+                               WHERE OrderID = ?""",(orderid))
+         return self.cursor.fetchone()
+    
+    def get_order_by_orderid(self,orderid):
+         self.cursor.execute("Select * from Orders where OrderID = ?",(orderid))
+         order = self.cursor.fetchone()
+         return order
+    
+    def change_order_status(self,orderid,status):
+         self.cursor.execute("Update Orders set StatusOfOrder = ? where OrderID = ?",(status,orderid))
+         self.conn.commit()
+         print("Order Updated Successfully")
 
-    def get_order_details(self):
-        print(f"Order ID: {self.order_id}")
-        print(f"Customer: {self.customer.name}")
-        print(f"Order Date: {self.order_date}")
-        print(f"Status: {self.status}")
-        print(f"Order Items:")
-        for item in self.__order_items:
-            product = item['product']
-            quantity = item['quantity']
-            print(f"{product.name} ({quantity} x {product.price}): {quantity * product.price}")
+    def cancel_order(self,orderid):
+         self.cursor.execute("delete from OrderDetails where OrderID = ?",(orderid))
+         self.conn.commit()
+         self.cursor.execute("delete from Orders where OrderID = ?",(orderid))
+         self.conn.commit()
+         print("Deleted Successfully")
 
-    def update_order_status(self, new_status):
-        self.__status = new_status
-
-    def cancel_order(self):
-        for item in self.__order_items:
-            product = item['product']
-            quantity = item['quantity']
-            product.in_stock -= quantity

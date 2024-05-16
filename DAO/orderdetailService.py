@@ -1,22 +1,26 @@
+from Util.DBConn import DBConnection
 from decimal import Decimal
-class OrderDetailsService:
-    def __init__(self, order_detail):
-        self.order_detail = order_detail
-    def calculate_subtotal(self):
-        subtotal = self.__product.price * self.__quantity
-        return subtotal - (subtotal * (self.__discount / Decimal('100.00')))
+class OrderDetailsService(DBConnection):
+    def Update_quantity(self,orderid,quantity):
+        self.cursor.execute("update OrderDetails set Quantity = ? where OrderID = ?",(quantity,orderid))
+        self.conn.commit()
+        # self.cursor.execute("""Update Orders
+        #                        set TotalAmount = 
+        self.cursor.execute("Select sum(Quantity * Price) as TotalAmount from OrderDetails inner join Products ON OrderDetails.ProductID = Products.ProductID WHERE OrderID = ?",
+                            (orderid))
+        totalamount = self.cursor.fetchone()[0]
+        print(f"New Total Amount : {totalamount}")
+        self.cursor.execute("update Orders set TotalAmount = ? where OrderID = ?",(totalamount,orderid))
+        self.conn.commit()
+        print("Updated Successfully")
+    
+    def add_discount(self,orderid,discount):
+        self.cursor.execute("select TotalAmount from Orders where OrderID = ?", (orderid))
+        current_total = self.cursor.fetchone()[0]
+        current_total = float(current_total)
+        discounted_total = current_total * (1 - discount / 100)
+        discounted_total = Decimal(discounted_total)
+        self.cursor.execute("update Orders set TotalAmount = ? where OrderID = ?", (discounted_total, orderid))
+        self.cursor.commit()
 
-    def get_order_detail_info(self):
-        print(f"Order Detail ID: {self.order_detail_id}")
-        print(f"Order ID: {self.order.order_id}")
-        print(f"Product Name: {self.product.name}")
-        print(f"Quantity: {self.quantity}")
-        print(f"Price: {self.product.price}")
-        print(f"Discount: {self.discount}%")
-        print(f"Subtotal: {self.calculate_subtotal()}")
-
-    def update_quantity(self, new_quantity):
-        self.__quantity = new_quantity
-
-    def add_discount(self, discount):
-        self.__discount = discount
+        return discounted_total

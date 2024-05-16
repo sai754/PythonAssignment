@@ -3,147 +3,218 @@ from DAO import CustomerService, InventoryService, OrderDetailsService, OrderSer
 from Exception.exceptions import IncompleteOrderException
 from datetime import datetime
 
+
+
+def CustomerMenu():
+    customer_service = CustomerService()
+    while(True):
+        print("""
+Do you want to
+1. Create Customer
+2. View Customers
+3. Update Customers
+4. Go Back
+              """)
+        choice = int(input("Enter your choice: "))
+        if choice == 1 :
+             customer_service.get_all_customer()
+             print("Create Customer next customer")
+             customer_id = int(input("Enter Customer ID: "))
+             first_name = input("Enter first name: ")
+             last_name = input("Enter last name: ")
+             email = input("Enter your email address ")
+             allemails = customer_service.get_all_email()
+             if email in allemails:
+                 print("Email already exists")
+             else:
+                 phone = int(input("Enter Phone number: "))
+                 address = input("Enter Address: ")
+                 newCustomer = Customer(customer_id,first_name,last_name,email,phone,address)
+                 customer_service.create_customer(newCustomer,customer_id)
+        elif choice == 2:
+            customer_service.get_all_customer()
+        elif choice == 3:
+            customer_service.get_all_customer()
+            customer_id = int(input("Enter the customer id you want to update : "))
+            first_name = input("Enter first name: ")
+            last_name = input("Enter last name: ")
+            email = input("Enter your email address ")
+            allemails = customer_service.get_all_email()
+            if email in allemails:
+                 print("Email already exists")
+            else:
+                 phone = int(input("Enter Phone number: "))
+                 address = input("Enter Address: ")
+                 newCustomer = Customer(customer_id,first_name,last_name,email,phone,address)
+                 customer_service.update_customerDB(newCustomer,customer_id)
+        else:
+            break
+
+def ProductsMenu():
+    product_service = ProductService()
+    while(True):
+        print("""
+Do you want to
+1. Create Product
+2. Update Product Info
+3. Get Products Info
+4. Check If the Product is in Stock
+5. Go Back""")
+        choice = int(input("Enter your choice: "))
+        if choice == 1:
+            product_service.get_all_products()
+            print("Enter Product Details")
+            product_id = int(input("Enter the Product ID: "))
+            product_name = input("Enter the Name of the Product: ")
+            dedscription = input("Enter the Description: ")
+            pricef = float(input("Enter the Price (with 2 decimal values): "))
+            price = format(pricef,".2f")
+            newProduct = Product(product_id,product_name,dedscription,price)
+            product_service.create_product(newProduct)
+        if choice == 2:
+            product_service.get_all_products()
+            product_id = int(input("Enter the Product ID you want to Update :"))
+            product_name = input("Enter the Name of the Product: ")
+            description = input("Enter the Description: ")
+            pricef = float(input("Enter the Price (with 2 decimal values): "))
+            price = format(pricef,".2f")
+            newProduct = Product(product_id,product_name,description,price)
+        if choice == 3:
+            product_service.get_all_products()
+            product_id = int(input("Enter the Product ID: "))
+            product = product_service.get_productById(product_id)
+            if product:
+                print(product)
+            else:
+                print(f"Product with this product id {product_id} not found")
+        if choice == 4:
+            product_service.get_all_products()
+            product_id = int(input("Enter the Product ID: "))
+            quantity = product_service.is_product_instock(product_id)
+            if quantity:
+                if quantity[0] > 0:
+                    print(f"Product is Available in Stock , Available = {quantity[0]}")
+                else:
+                    print("It is out of stock")
+            else:
+                print("It is not available in inventory")
+        else: 
+            break
+def OrdersMenu():
+    order_service = OrderService()
+    product_service = ProductService()
+    customer_service = CustomerService()
+    orderdetail_service = OrderDetailsService()
+    while(True):
+        print("""
+Do you want to 
+1. Create an Order
+2. Calculate Total Amount of Order:
+3. Get Order Details
+4. Change the status of the order
+5. Cancel Order
+6. Change Quantity
+7. Add Discount
+8. Exit""" )
+        choice = int(input("Enter the choice: "))
+        if choice == 1:
+            customer_id = int(input("Enter the Customer ID: "))
+            customer = customer_service.get_customer_detailsDB(customer_id)
+            print(customer)
+            print("Available Products are: ")
+            product_service.available_products()
+            order_service.create_order(customer_id)
+        elif choice == 2:
+            order_service.GetAllOrders()
+            orderid = int(input("Enter the Order ID to verify total amount: "))
+            total_amount = order_service.calcuclate_total_amount(orderid)
+            print(f"The total amount of the order : {total_amount}")
+        elif choice == 3:
+            orderid = int(input("Enter the order id: "))
+            order = order_service.get_order_by_orderid(orderid)
+            if order:
+                print(order)
+            else:
+                print(f"No Order found for the order id {orderid}")
+        elif choice == 4:
+            order_service.get_All_Orders()
+            orderid = int(input("Enter the Order Id: "))
+            status = input("Enter the New status of the Order: ")
+            order_service.change_order_status(orderid,status)
+        elif choice == 5:
+            order_service.get_All_Orders()
+            orderid = int(input("Enter the OrderID of Order you want to delete: "))
+        elif choice == 6:
+            order_service.get_All_Orders()
+            orderid = int(input("Enter the Order ID: "))
+            quantity = int(input("Enter the Updated Quantity: "))
+            orderdetail_service.Update_quantity(orderid,quantity)
+        elif choice == 7:
+            order_service.get_All_Orders()
+            orderid = int(input("Enter the OrderID: "))
+            discount = int(input("Enter the discount percentage: "))
+            newAmount = orderdetail_service.add_discount(orderid,discount)
+            print(f"The new Total Amount is : {newAmount}")
+        else:
+            break
+
+def InventoryMenu():
+    inventory_service = InventoryService()
+    while(True):
+        print("""
+Do you want to
+1. Get Product with Inventory Id
+2. Get the Quantity In Stock
+3. Add Quantity to Inventory
+4. Remove Quantity from Inventory
+5. List Low Stock Products
+6. List Out Of Stock Products
+7. Go Back""")
+        choice = int(input("Enter your choice: "))
+        if choice == 1:
+            inventory_id = int(input("Enter the inventory id: "))
+            inventory_service.get_product_by_invId(inventory_id)
+        if choice == 2:
+            inventory_id = int(input("Enter inventory id: "))
+            inventory_service.get_quantity(inventory_id)
+        if choice == 3:
+            inventory_id = int(input("Enter inventory id: "))
+            quantity = int(input("Enter the quantity you want to add: "))
+            inventory_service.addTo_inventory(inventory_id,quantity)
+        if choice == 4:
+            inventory_id = int(input("Enter inventory id: "))
+            quantity = int(input("Enter the quantity you want to remove: "))
+            inventory_service.removeFrom_inventory(inventory_id,quantity)
+        if choice == 5:
+            threshold = int(input("Enter the threshold value: "))
+            inventory_service.low_stock_items(threshold)
+        if choice == 6:
+            inventory_service.out_of_stock_items()
+        else:
+            break
+def MainMenu():
+    while(True):
+        print("""
+    1. Customer Menu
+    2. Product Menu
+    3. Orders Menu
+    4. Inventory Menu
+    5. Exit""")
+        choice = int(input("Enter your choice: "))
+        if choice == 1:
+            CustomerMenu()
+        elif choice == 2:
+            ProductsMenu()
+        elif choice == 3:
+            OrdersMenu()
+        elif choice == 4:
+            InventoryMenu()
+        else:
+            break
+
+
 if __name__ == "__main__":
-    # Customer class and Customer Service
-    customer1 = Customer(1, "Sai", "Subash", "sai@example.com", "1234567890", "Ambattur")
-
-    # Create a CustomerService object
-    customer_service = CustomerService(customer1)
-
-    # Get customer details
-    print("Customer Details Before Update :")
-    customer_service.get_customer_details()
-
-    # Update customer info
-    customer_service.update_customer_info(first_name="SAII", phone="9876543210")
-
-    # Get updated customer details
-    print("Customer Details After Update:")
-    customer_service.get_customer_details()
-
-    order = Order("001", customer1)
-    order_service = OrderService(order)
-
-    try:
-        order_detail = OrderDetails(1, order,None, 5)  # Attempt to create an order detail with a missing product reference
-    except IncompleteOrderException as e:
-        print("IncompleteOrderException:", e)
-
-    inventory = Inventory(1, "Laptop", 10, "2024-05-15")
-    inventory_service = InventoryService(inventory)
-
-    try:
-        inventory_service.remove_from_inventory(15)  # Attempting to remove more stock than available
-    except Exception as e:
-        print(e)
-
-    # Task 6
-    # Products List
-    Product.add_product(1, "Laptop", "High-performance laptop", 1000)
-    Product.add_product(2, "Headphones", "Wireless headphones", 50)
-
-    # Update product
-    Product.update_product(1, new_name="Gaming Laptop")
-    Product.view_all_products()
-    # Remove product
-    try:
-        Product.remove_product(2)
-    except ValueError as e:
-        print(e)
-
-    # Try to remove product with existing orders
-    try:
-        Product.remove_product(1)
-    except ValueError as e:
-        print(e)
-    
-    # Orders List
-    order_1 = Order.add_order(1, "Sai")
-    order_2 = Order.add_order(2, "John")
-
-    # Update order status
-    Order.update_order_status(1, "shipped")
-
-    # Cancel order
-    Order.cancel_order(2)
-
-    # Sorted Lists
-
-    Order.add_order(1, "Sai", datetime(2024, 5, 1))
-    Order.add_order(2, "John", None)
-    Order.add_order(3, "Alice", datetime(2024, 5, 2))
-
-    # Sort orders by date in ascending order
-    asc = True
-    Order.sort_orders_by_date(asc)
-    print("Sorted orders by date:")
-    for order in Order.orders:
-        print(f"Order ID: {order.order_id}, Date: {order.order_date}")
-
-    
-    # Inventory List
-    
-    Inventory.add_inventory(1, "Product A", 100, "2024-05-01")
-    Inventory.add_inventory(3, "Product C", 50, "2024-05-02")
-    Inventory.add_inventory(2, "Product B", 75, "2024-05-03")
-
-    # Get inventory information
-    Inventory.get_inventory_info()
-
-    # Update stock quantity
-    Inventory.update_stock_quantity(1, 120)
-
-    # Remove a product from inventory
-    Inventory.remove_inventory(3)
-
-    # Get updated inventory information
-    Inventory.get_inventory_info()
-
-    # Product Search and Retrieval
-
-    product1 = Product(1, "Laptop", "Electronics", 1200)
-    product2 = Product(2, "Phone", "Electronics", 800)
-    product3 = Product(3, "T-shirt", "Apparel", 20)
-    product4 = Product(4, "Shoes", "Apparel", 50)
-
-    # Search products by name
-    try:
-        laptop_products = Product.search_by_name("Laptop")
-        print("Products with 'laptop' in the name:")
-        for product in laptop_products:
-            print(f"Product ID: {product.product_id}, Name: {product.product_name}")
-    except ValueError as e:
-        print(e)
-
-    # Search Prodcts by price
-    try:
-        affordable_products = Product.search_by_price_range(0, 100)
-        print("\nProducts within the price range 0 - 100:")
-        for product in affordable_products:
-            print(f"Product ID: {product.product_id}, Name: {product.product_name}, Price: ${product.price}")
-    except ValueError as e:
-        print(e)
-
-    # Check Duplicate Products
-    # Implemented find_by_id and check_duplicates
-    product1 = Product.add_product(9, "ABC", "Electronics", 1200)
-    product2 = Product.add_product(8, "EFG", "Electronics", 800)
-
-    # Record Payments
-
-    order1 = Order(101, "John Doe", 0)  # Initialize total_amount_paid to 0
-    order2 = Order(102, "Jane Smith", 0)
-
-    # Recording payments for orders
-    order1.record_payment(1200)
-    order2.record_payment(1600)
-
-    # Display payment records
-    print("\nPayment Records:")
-    for payment in PaymentRecord.payment_records:
-        print(f"Order ID: {payment.order_id}, Amount: {payment.amount}, Status: {payment.status}, Payment Date: {payment.payment_date}")
-
-
+    MainMenu()
 
 
 
