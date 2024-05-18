@@ -20,11 +20,22 @@ class OrderService(DBConnection):
         self.cursor.execute("INSERT INTO Orders VALUES (?,?, ?, ?,?)",
                            (orderid,customerid, date.today(), total_amount,"Pending"))
         self.conn.commit()
-        orderdetailid = self.cursor.execute("select top 1 OrderDetailID from OrderDetails order by OrderDetailID desc ").fetchone()[0] + 1
         for item in order_items:
+                orderdetailid = self.cursor.execute("select top 1 OrderDetailID from OrderDetails order by OrderDetailID desc ").fetchone()[0] + 1
                 self.cursor.execute("INSERT INTO OrderDetails VALUES (?, ?, ?,?)",
                                (orderdetailid, orderid, item['product_id'], item['quantity']))
         self.conn.commit()
+        for item in order_items:
+             oldquantity = self.cursor.execute("Select QuantityInStock from Inventory where ProductID = ?",item['product_id']).fetchone()[0]
+             if oldquantity < item['quantity']:
+                  print(f"This Product with product id {item['product_id']} Order cannot be placed because of insufficient stock!")
+                  self.cursor.execute("Delete from OrderDetails where OrderID = ? and ProductID = ?",(orderid, item['product_id']))
+                  self.conn.commit()
+                  self.cursor.execute("Delete from Orders where OrderID = ?",orderid)
+                  continue
+             newQuantity = oldquantity - item["quantity"]
+             self.cursor.execute("Update Inventory set QuantityInStock = ? where ProductID = ?",(newQuantity,item['product_id']))
+             self.conn.commit()
         print("Order placed successfully!")
     
     def get_All_Orders(self):

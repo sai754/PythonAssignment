@@ -1,4 +1,5 @@
 from Util.DBConn import DBConnection
+from datetime import date
 class ProductService(DBConnection):
     def create_product(self,product):
         category = int(input("Enter the Category (1-5): "))
@@ -6,6 +7,12 @@ class ProductService(DBConnection):
                             (product.product_id,product.product_name,product.description,product.price,
                              category))
         self.cursor.commit()
+        quantity = int(input("Enter the Quantity: "))
+        last_date_stock = date.today()
+        inven_id = self.cursor.execute("Select top 1 InventoryID from Inventory Order by InventoryID desc").fetchone()[0] + 1
+        self.cursor.execute("Insert into Inventory values (?,?,?,?)",
+                            (inven_id, product.product_id,quantity,last_date_stock))
+        self.conn.commit()
         print("Product Created Successfully")
     
     def get_all_products(self):

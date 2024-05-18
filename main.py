@@ -79,6 +79,7 @@ Do you want to
             pricef = float(input("Enter the Price (with 2 decimal values): "))
             price = format(pricef,".2f")
             newProduct = Product(product_id,product_name,description,price)
+            product_service.update_product(newProduct,product_id)
         if choice == 3:
             product_service.get_all_products()
             product_id = int(input("Enter the Product ID: "))
@@ -125,10 +126,10 @@ Do you want to
             product_service.available_products()
             order_service.create_order(customer_id)
         elif choice == 2:
-            order_service.GetAllOrders()
+            order_service.get_All_Orders()
             orderid = int(input("Enter the Order ID to verify total amount: "))
             total_amount = order_service.calcuclate_total_amount(orderid)
-            print(f"The total amount of the order : {total_amount}")
+            print(f"The total amount of the order : {total_amount[0]}")
         elif choice == 3:
             orderid = int(input("Enter the order id: "))
             order = order_service.get_order_by_orderid(orderid)
@@ -144,6 +145,7 @@ Do you want to
         elif choice == 5:
             order_service.get_All_Orders()
             orderid = int(input("Enter the OrderID of Order you want to delete: "))
+            order_service.cancel_order(orderid)
         elif choice == 6:
             order_service.get_All_Orders()
             orderid = int(input("Enter the Order ID: "))

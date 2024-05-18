@@ -12,7 +12,7 @@ class InventoryService(DBConnection):
         self.cursor.execute("Select QuantityInStock from Inventory where InventoryID = ?",(inventoryid))
         product = self.cursor.fetchone()
         if product:
-            print(product)
+            print(product[0])
         else:
             print(f"No Product with the Inventory ID {inventoryid}")
     
@@ -33,7 +33,7 @@ class InventoryService(DBConnection):
             self.conn.commit()
             print("Updated Successfully")
         else:
-            print("Not Enough Available Quantity to Remove")
+            raise InsufficientStockException("Not enough stock available")
     
     def low_stock_items(self,threshold):
         self.cursor.execute("select * from Products join Inventory on Products.ProductID = Inventory.ProductID where Inventory.QuantityInStock < ?",(threshold))

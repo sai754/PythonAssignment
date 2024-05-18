@@ -31,7 +31,7 @@ class CustomerService(DBConnection):
         return result
     
     def update_customerDB(self,customer, customer_id):
-        self.cursor.execute("""Update Customer
+        self.cursor.execute("""Update Customers
                             set FirstName = ?, LastName = ?, Email = ?, Phone = ?, Address = ?
                             where CustomerID = ?""",
                             (customer.first_name, customer.last_name,customer.email,customer.phone,customer.address,customer_id))
