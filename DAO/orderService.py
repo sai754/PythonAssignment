@@ -3,6 +3,7 @@ from decimal import Decimal
 from datetime import date
 class OrderService(DBConnection):
     def create_order(self,customerid):
+        self.product_recommend()
         order_items = []
         while (True):
             product_id = int(input("Enter Product ID to add to the order (0 to finish): "))
@@ -51,7 +52,7 @@ class OrderService(DBConnection):
          return self.cursor.fetchone()
     
     def get_order_by_orderid(self,orderid):
-         self.cursor.execute("Select * from Orders where OrderID = ?",(orderid))
+         self.cursor.execute("Select * from Orders where OrderID = %?%",(orderid))
          order = self.cursor.fetchone()
          return order
     
@@ -66,4 +67,11 @@ class OrderService(DBConnection):
          self.cursor.execute("delete from Orders where OrderID = ?",(orderid))
          self.conn.commit()
          print("Deleted Successfully")
+     
+    def product_recommend(self):
+         product = input("Enter the Product you want to get: ")
+         self.cursor.execute("Select * from Products where ProductName like ?",f"%{product}%")
+         for row in self.cursor:
+              print(row)
+
 
