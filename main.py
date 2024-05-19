@@ -116,7 +116,8 @@ Do you want to
 5. Cancel Order
 6. Change Quantity
 7. Add Discount
-8. Exit""" )
+8. Report Generation
+9. Exit""" )
         choice = int(input("Enter the choice: "))
         if choice == 1:
             customer_id = int(input("Enter the Customer ID: "))
@@ -157,6 +158,8 @@ Do you want to
             discount = int(input("Enter the discount percentage: "))
             newAmount = orderdetail_service.add_discount(orderid,discount)
             print(f"The new Total Amount is : {newAmount}")
+        elif choice == 8:
+            orderdetail_service.generate_report()
         else:
             break
 

@@ -22,3 +22,8 @@ class AuthenticationException(Exception):
     def __init__(self, message="You are not Authenticated for this"):
         self.message = message
         super().__init__(self.message)
+
+class IOException(Exception):
+    def __init__(self, message="Problem with IO handling with the file"):
+        self.message = message
+        super().__init__(self.message)

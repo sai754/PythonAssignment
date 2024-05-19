@@ -1,0 +1,14 @@
+CustomerID,FirstName,Email,ProductName,OrderID,OrderDate,TotalAmount,Quantity
+1,Sai,abc@gmail.com,Vivo T3,1,2024-01-02,154000.00,7
+2,Rex,def@gmail.com,HP Pavilion Laptop,2,2024-01-05,132000.00,3
+3,Akash,bce@gmail.com,Samsung Tablet,3,2024-01-03,66000.00,4
+4,Alen,ghi@gmail.com,Logitech Keyboard,4,2024-01-03,11000.00,5
+5,Induja,jkl@gmail.com,Boat Speaker,5,2024-02-04,39600.00,8
+6,John,mno@gmail.com,Boat Headphones,6,2024-02-01,33000.00,6
+7,David,aex@gmail.com,Boat Smartwatch,7,2024-01-06,44000.00,10
+8,Micheal,uvw@gmail.com,Samsung Smartphone,8,2024-02-05,247500.00,5
+9,Jane,xyz@gmail.com,PS5,9,2024-01-04,220000.00,4
+10,Emily,aaa@gmail.com,Logitech Mouse,10,2024-02-02,1650.00,1
+2,Rex,def@gmail.com,HP Pavilion Laptop,12,2024-05-16,39600.00,5
+3,Akash,bce@gmail.com,Logitech Mouse,14,2024-05-18,8250.00,5
+4,Alen,ghi@gmail.com,Logitech Mouse,16,2024-05-18,1567.50,1
